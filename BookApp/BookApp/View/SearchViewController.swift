@@ -6,24 +6,30 @@
 //
 
 import UIKit
+import SnapKit
 
-class SearchViewController: UIViewController {
-
+final class SearchViewController: UIViewController {
+    
+    private let searchBar = UISearchBar()
+    private let searchResultView = BookListCollectionView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        view.backgroundColor = .white
+        setupUI()
     }
-    
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    private func setupUI() {
+        [searchBar, searchResultView].forEach {
+            view.addSubview($0)
+        }
+        searchBar.snp.makeConstraints {
+            $0.top.leading.trailing.equalTo(view.safeAreaLayoutGuide)
+        }
+        searchResultView.snp.makeConstraints {
+            $0.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
+            $0.top.equalTo(searchBar.snp.bottom)
+        }
     }
-    */
-
 }
