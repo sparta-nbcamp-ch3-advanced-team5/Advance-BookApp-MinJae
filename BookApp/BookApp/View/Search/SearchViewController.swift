@@ -36,7 +36,8 @@ final class SearchViewController: UIViewController {
     private func bind() {
         searchResultView.rx.itemSelected
             .subscribe(onNext: { [weak self] indexPath in
-                print(self?.item[indexPath.row])
+                let book = self?.item[indexPath.row]
+                self?.present(BookDetailViewController(book: book!), animated: true)
             })
             .disposed(by: disposeBag)
     }
