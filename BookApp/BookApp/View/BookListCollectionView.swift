@@ -15,23 +15,24 @@ enum Section: Hashable {
 final class BookListCollectionView: UICollectionView {
     
     // DiffableDataSource
-    
     typealias DataSource = UICollectionViewDiffableDataSource<Section, Book>
     typealias SnapShot = NSDiffableDataSourceSnapshot<Section, Book>
     
     private var datasource: DataSource?
     private var section: Section?
+    private var item = [Book]()
     
-    convenience init(section: Section) {
+    convenience init(section: Section, item: [Book]) {
         self.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
         self.section = section
+        self.item = item
         setupUI()
     }
     
     private func setupUI() {
         self.collectionViewLayout = createLayout()
         configureDatasource()
-        apply(at: .search, to: [Book(title: "세이노의 가르침", author: "세이노", price: "14000")])
+        apply(at: .search, to: self.item)
     }
     // DiffableDatasource 설정
     private func configureDatasource() {
@@ -55,7 +56,6 @@ final class BookListCollectionView: UICollectionView {
             return self.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
         }
     }
-    
     
     // Snapshot 생성 및 적용
     private func apply(at section: Section, to item: [Book]) {
@@ -108,6 +108,6 @@ final class BookListCollectionView: UICollectionView {
         
         return UICollectionViewCompositionalLayout(section: section)
     }
-    
-    
 }
+
+
