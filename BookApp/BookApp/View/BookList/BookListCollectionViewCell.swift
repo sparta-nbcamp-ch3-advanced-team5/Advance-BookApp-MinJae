@@ -64,7 +64,7 @@ final class BookListCollectionViewCell: UICollectionViewCell {
     
     func configure(model: Book) {
         self.bookTitleLabel.text = model.title
-        self.authorLabel.text = model.author
+        self.authorLabel.text = model.authors.joined(separator: ", ")
         self.priceLabel.text = "\(model.price)원"
     }
     

@@ -10,7 +10,7 @@ import SnapKit
 
 final class MyBookViewController: UIViewController {
 
-    private let myBookCollectionView = BookListCollectionView(section: .myBook, item: [Book(title: "세이노의 가르침", author: "세이노", price: "14000")])
+    private let myBookCollectionView = BookListCollectionView(section: .myBook)
     
     override func viewDidLoad() {
         super.viewDidLoad()
