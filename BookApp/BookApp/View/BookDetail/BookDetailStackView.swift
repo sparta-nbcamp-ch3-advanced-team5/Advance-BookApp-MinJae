@@ -64,7 +64,7 @@ final class BookDetailStackView: UIStackView {
     private func configure(with book: Book) {
         self.titleLabel.text = book.title
         self.authorLabel.text = book.authors.joined(separator: ", ")
-        self.bookImageView.image = UIImage(named: book.imageURL!)
+        self.bookImageView.image = UIImage(named: book.imageURL ?? "")
         self.priceLabel.text = "\(book.price)원"
         self.descriptionLabel.text = book.description
     }

@@ -28,6 +28,7 @@ final class BookListCollectionView: UICollectionView {
     }
     
     private func setupUI() {
+        self.showsVerticalScrollIndicator = false
         self.collectionViewLayout = createLayout()
         configureDatasource()
         apply(at: .search, to: self.item)
