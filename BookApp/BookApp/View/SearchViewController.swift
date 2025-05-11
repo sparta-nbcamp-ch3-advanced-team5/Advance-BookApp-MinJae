@@ -11,7 +11,7 @@ import SnapKit
 final class SearchViewController: UIViewController {
     
     private let searchBar = UISearchBar()
-    private let searchResultView = BookListCollectionView()
+    private let searchResultView = BookListCollectionView(section: .search)
     
     override func viewDidLoad() {
         super.viewDidLoad()

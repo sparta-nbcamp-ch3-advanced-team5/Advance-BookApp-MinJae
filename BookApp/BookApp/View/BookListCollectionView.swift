@@ -7,27 +7,32 @@
 
 import UIKit
 
+enum Section: Hashable {
+    case search
+    case myBook
+}
+
 final class BookListCollectionView: UICollectionView {
     
     // DiffableDataSource
-    enum Section: Hashable { case main }
+    
     typealias DataSource = UICollectionViewDiffableDataSource<Section, Book>
     typealias SnapShot = NSDiffableDataSourceSnapshot<Section, Book>
     
-    var datasource: DataSource?
+    private var datasource: DataSource?
+    private var section: Section?
     
-    override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
-        super.init(frame: frame, collectionViewLayout: UICollectionViewLayout())
+    convenience init(section: Section) {
+        self.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
+        self.section = section
+        setupUI()
+    }
+    
+    private func setupUI() {
         self.collectionViewLayout = createLayout()
         configureDatasource()
-        apply()
-        self.reloadData()
+        apply(at: .search, to: [Book(title: "세이노의 가르침", author: "세이노", price: "14000")])
     }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     // DiffableDatasource 설정
     private func configureDatasource() {
         
@@ -42,7 +47,8 @@ final class BookListCollectionView: UICollectionView {
         })
         
         //header 등록
-        let headerRegistration = UICollectionView.SupplementaryRegistration<BookListCollectionHeaderView>(elementKind: UICollectionView.elementKindSectionHeader) { supplementaryView, elementKind, indexPath in
+        let headerRegistration = UICollectionView.SupplementaryRegistration<BookListCollectionHeaderView>(elementKind: UICollectionView.elementKindSectionHeader) {[unowned self] supplementaryView, elementKind, indexPath in
+            supplementaryView.configure(with: self.section ?? .search)
         }
         //header 설정
         self.datasource?.supplementaryViewProvider = { collectionView, elementKind, indexPath in
@@ -50,17 +56,22 @@ final class BookListCollectionView: UICollectionView {
         }
     }
     
-    // snapshot 생성
-    private func makeSnapshot() -> SnapShot {
-        var snapshot = SnapShot()
-        snapshot.appendSections([.main])
-        snapshot.appendItems([Book(title: "세이노의 가르침", author: "세이노", price: "14000")], toSection: .main)
-        return snapshot
-    }
     
-    // 적용
-    private func apply() {
-        datasource?.apply(makeSnapshot(), animatingDifferences: true)
+    // Snapshot 생성 및 적용
+    private func apply(at section: Section, to item: [Book]) {
+        var snapshot = SnapShot()
+        
+        if case .myBook = section {
+            snapshot.appendSections([.myBook])
+            snapshot.appendItems(item, toSection: .myBook)
+        }
+        
+        if case .search = section {
+            snapshot.appendSections([.search])
+            snapshot.appendItems(item, toSection: .search)
+        }
+        
+        datasource?.apply(snapshot, animatingDifferences: true)
     }
     
     // UICollectionViewCompositionalLayout

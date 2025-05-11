@@ -18,6 +18,20 @@ final class BookListCollectionHeaderView: UICollectionReusableView {
         return label
     }()
     
+    private let removeAllButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("전체 삭제", for: .normal)
+        button.setTitleColor(.systemBlue, for: .normal)
+        return button
+    }()
+    
+    private let addButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("추가", for: .normal)
+        button.setTitleColor(.systemBlue, for: .normal)
+        return button
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -28,11 +42,42 @@ final class BookListCollectionHeaderView: UICollectionReusableView {
     }
     
     private func setupUI() {
-        self.addSubview(titleLabel)
+        [titleLabel, removeAllButton, addButton].forEach {
+            addSubview($0)
+        }
+    }
+    
+    func configure(with section: Section) {
+        titleLabel.snp.removeConstraints()
+        removeAllButton.snp.removeConstraints()
+        addButton.snp.removeConstraints()
         
-        titleLabel.snp.makeConstraints {
-            $0.centerY.equalToSuperview()
-            $0.leading.equalToSuperview()
+        if case .myBook = section {
+            removeAllButton.isHidden = false
+            addButton.isHidden = false
+            titleLabel.snp.makeConstraints {
+                $0.center.equalToSuperview()
+            }
+            
+            removeAllButton.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.leading.equalToSuperview()
+            }
+            
+            addButton.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.trailing.equalToSuperview()
+            }
+            
+        }
+        
+        if case .search = section {
+            removeAllButton.isHidden = true
+            addButton.isHidden = true
+            titleLabel.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.leading.equalToSuperview()
+            }
         }
     }
     
