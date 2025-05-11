@@ -11,8 +11,8 @@ struct Book: Hashable, Decodable {
     let title: String
     let authors: [String]
     let price: Int
-    let description: String = ""
-    let imageURL: String = ""
+    let description: String?
+    let imageURL: String?
     
     enum CordingKeys: String, CodingKey {
         case title
@@ -23,6 +23,6 @@ struct Book: Hashable, Decodable {
     }
 }
 
-struct BookResponse: Decodable {
+struct BookResponse: Hashable, Decodable {
     let documents: [Book]
 }
