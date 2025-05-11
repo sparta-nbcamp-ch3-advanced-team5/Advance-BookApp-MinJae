@@ -11,4 +11,6 @@ struct Book: Hashable {
     let title: String
     let author: String
     let price: String
+    let description: String = ""
+    let imageURL: String = ""
 }
