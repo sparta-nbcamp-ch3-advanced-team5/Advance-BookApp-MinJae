@@ -19,15 +19,16 @@ final class BookListCollectionViewCell: UICollectionViewCell {
     
     private let authorLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 17, weight: .regular)
+        label.font = .systemFont(ofSize: 14, weight: .regular)
         label.textColor = .secondaryLabel
         return label
     }()
     
     private let priceLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 17, weight: .regular)
+        label.font = .systemFont(ofSize: 14, weight: .regular)
         label.textColor = .label
+        label.textAlignment = .right
         return label
     }()
     
@@ -47,18 +48,20 @@ final class BookListCollectionViewCell: UICollectionViewCell {
         
         bookTitleLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.leading.equalToSuperview().inset(10)
+            $0.leading.equalToSuperview().inset(5)
             $0.width.equalToSuperview().dividedBy(2)
         }
         
         authorLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.leading.equalTo(bookTitleLabel.snp.trailing).offset(15)
+            $0.leading.equalTo(bookTitleLabel.snp.trailing).offset(10)
+            $0.trailing.equalTo(priceLabel.snp.leading).offset(-10)
         }
         
         priceLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.trailing.equalToSuperview().inset(10)
+            $0.trailing.equalToSuperview()
+            $0.width.greaterThanOrEqualTo(40)
         }
     }
     
