@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+struct Book: Hashable {
+    let title: String
+    let author: String
+    let price: String
+}
