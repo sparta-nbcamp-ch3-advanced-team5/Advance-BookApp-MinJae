@@ -14,7 +14,6 @@ final class SearchViewController: UIViewController {
     
     private let searchBar = UISearchBar()
     private let searchResultView: BookListCollectionView
-    private var item: [Book] = []
     private let disposeBag = DisposeBag()
     private let viewModel = SearchViewModel()
     
@@ -38,7 +37,7 @@ final class SearchViewController: UIViewController {
     private func bind() {
         searchResultView.rx.itemSelected
             .subscribe(onNext: { [weak self] indexPath in
-                let book = self?.item[indexPath.row]
+                let book = self?.viewModel.item[indexPath.row]
                 self?.present(BookDetailViewController(book: book!), animated: true)
             })
             .disposed(by: disposeBag)

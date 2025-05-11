@@ -14,7 +14,7 @@ final class SearchViewModel {
     private let networkManager: NetworkManager
     private let disposeBag = DisposeBag()
     private(set) var fetchedBooks = PublishSubject<[Book]>()
-    
+    var item: [Book] = []
     init(networkManager: NetworkManager = .init()) {
         self.networkManager = networkManager
     }
@@ -24,6 +24,7 @@ final class SearchViewModel {
             await networkManager.fetch(query: query)
                 .subscribe(onSuccess: {[weak self] (data: BookResponse) in
                     self?.fetchedBooks.onNext(data.documents)
+                    self?.item = data.documents
                 }, onFailure: { error in
                     print(error.localizedDescription)
                 }).disposed(by: disposeBag)
