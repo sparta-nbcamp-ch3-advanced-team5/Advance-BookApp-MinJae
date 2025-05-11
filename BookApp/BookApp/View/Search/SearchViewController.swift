@@ -14,11 +14,12 @@ final class SearchViewController: UIViewController {
     
     private let searchBar = UISearchBar()
     private let searchResultView: BookListCollectionView
-    private let item: [Book] = [Book(title: "세이노의 가르침", author: "세이노", price: "14000")]
+    private var item: [Book] = []
     private let disposeBag = DisposeBag()
+    private let viewModel = SearchViewModel()
     
     init() {
-        self.searchResultView = BookListCollectionView(section: .search, item: item)
+        self.searchResultView = BookListCollectionView(section: .search)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -31,6 +32,7 @@ final class SearchViewController: UIViewController {
         view.backgroundColor = .white
         setupUI()
         bind()
+        searchBar.delegate = self
     }
     
     private func bind() {
@@ -38,6 +40,14 @@ final class SearchViewController: UIViewController {
             .subscribe(onNext: { [weak self] indexPath in
                 let book = self?.item[indexPath.row]
                 self?.present(BookDetailViewController(book: book!), animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.fetchedBooks
+            .withUnretained(self)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { owner, books in
+                owner.searchResultView.apply(at: .search, to: books)
             })
             .disposed(by: disposeBag)
     }
@@ -59,3 +69,10 @@ final class SearchViewController: UIViewController {
     }
 }
 
+extension SearchViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        guard let text = searchBar.text else { return }
+        viewModel.fetchBooks(query: text)
+    }
+}
