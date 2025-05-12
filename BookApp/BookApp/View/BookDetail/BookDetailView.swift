@@ -30,7 +30,7 @@ final class BookDetailView: UIView {
         scrollView.addSubview(bookDetailStackView)
         bookDetailFooterView.snp.makeConstraints {
             $0.leading.bottom.trailing.equalTo(self.safeAreaLayoutGuide)
-            $0.height.equalTo(80)
+            $0.height.equalTo(100)
         }
         scrollView.snp.makeConstraints {
             $0.width.equalToSuperview()
