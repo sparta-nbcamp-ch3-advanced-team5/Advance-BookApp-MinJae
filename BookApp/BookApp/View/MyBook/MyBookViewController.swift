@@ -11,7 +11,7 @@ import RxSwift
 
 final class MyBookViewController: UIViewController {
 
-    private let myBookCollectionView = BookListCollectionView(section: .myBook)
+    let myBookCollectionView = BookListCollectionView(section: .myBook)
     private let viewModel = MyBookViewModel()
     private let disposeBag = DisposeBag()
     

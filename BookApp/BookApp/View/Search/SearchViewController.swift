@@ -78,6 +78,10 @@ final class SearchViewController: UIViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(5)
         }
     }
+    
+    func activeSearchbar() {
+        searchBar.becomeFirstResponder()
+    }
 }
 
 extension SearchViewController: UISearchBarDelegate {
