@@ -17,7 +17,7 @@ final class BookListCollectionHeaderView: UICollectionReusableView {
         return label
     }()
     
-    private let removeAllButton: UIButton = {
+    let removeAllButton: UIButton = {
         let button = UIButton()
         button.setTitle("전체 삭제", for: .normal)
         button.setTitleColor(.systemBlue, for: .normal)
