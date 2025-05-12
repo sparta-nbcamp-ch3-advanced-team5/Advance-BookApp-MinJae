@@ -17,6 +17,7 @@ final class CoreDataManager {
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     private lazy var context = appDelegate.persistentContainer.viewContext
     
+    // CREATE
     func create(to book: Book) {
         guard let entity = NSEntityDescription.entity(forEntityName: CoreDatakey.bookEntityName, in: context) else { return }
         let newBook = NSManagedObject(entity: entity, insertInto: context)
@@ -31,7 +32,8 @@ final class CoreDataManager {
         }
     }
     
-    func read() {
+    // READ
+    func read() -> [Book] {
         do {
             let books = try context.fetch(MyBook.fetchRequest())
             var result = [Book]()
@@ -48,16 +50,14 @@ final class CoreDataManager {
                                    imageURL: nil)
                 )
             }
-            print(result)
+            return result
         } catch {
             print("CoreDataManager Read error")
+            return []
         }
     }
     
-    func update() {
-        
-    }
-    
+    // DELETE
     func delete(book: Book) {
         let request = MyBook.fetchRequest()
         request.predicate = NSPredicate(format: "title == %@", book.title)
