@@ -68,8 +68,22 @@ final class CoreDataManager {
             for element in result {
                 context.delete(element)
             }
+            try context.save()
         } catch {
             print("CoreDataManager Delete error")
+        }
+    }
+    
+    // DELETE ALL
+    func deleteAll() {
+        do {
+            let result = try context.fetch(MyBook.fetchRequest())
+            for element in result {
+                context.delete(element)
+            }
+            try context.save()
+        } catch {
+            print("CoreDataManager Delete All error")
         }
     }
     
