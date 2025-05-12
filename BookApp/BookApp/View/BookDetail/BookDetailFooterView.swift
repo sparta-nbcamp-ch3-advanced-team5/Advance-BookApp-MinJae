@@ -10,7 +10,7 @@ import SnapKit
 
 final class BookDetailFooterView: UIView {
     
-    private let cancelButton: UIButton = {
+    let cancelButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "xmark"), for: .normal)
         button.clipsToBounds = true
@@ -20,7 +20,7 @@ final class BookDetailFooterView: UIView {
         return button
     }()
     
-    private let addButton: UIButton = {
+    let addButton: UIButton = {
         let button = UIButton()
         button.setTitle("담기", for: .normal)
         button.titleLabel?.font = .boldSystemFont(ofSize: 20)

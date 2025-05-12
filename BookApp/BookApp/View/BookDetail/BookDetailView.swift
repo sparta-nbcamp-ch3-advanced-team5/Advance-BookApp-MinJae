@@ -12,7 +12,7 @@ final class BookDetailView: UIView {
     
     private let scrollView = UIScrollView()
     private let bookDetailStackView: BookDetailStackView
-    private let bookDetailFooterView = BookDetailFooterView()
+    let bookDetailFooterView = BookDetailFooterView()
     
     init(book: Book) {
         self.bookDetailStackView = BookDetailStackView(book: book)
