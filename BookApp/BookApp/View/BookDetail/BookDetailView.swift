@@ -39,7 +39,7 @@ final class BookDetailView: UIView {
         }
         bookDetailStackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
-            $0.width.height.equalToSuperview()
+            $0.width.equalToSuperview()
         }
     }
 }
