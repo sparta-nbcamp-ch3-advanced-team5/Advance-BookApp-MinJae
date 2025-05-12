@@ -14,7 +14,6 @@ final class BookListCollectionHeaderView: UICollectionReusableView {
         let label = UILabel()
         label.font = .systemFont(ofSize: 20, weight: .bold)
         label.textColor = .label
-        label.text = "검색 결과"
         return label
     }()
     
@@ -53,6 +52,7 @@ final class BookListCollectionHeaderView: UICollectionReusableView {
         addButton.snp.removeConstraints()
         
         if case .myBook = section {
+            titleLabel.text = "담은 책"
             removeAllButton.isHidden = false
             addButton.isHidden = false
             titleLabel.snp.makeConstraints {
@@ -72,6 +72,7 @@ final class BookListCollectionHeaderView: UICollectionReusableView {
         }
         
         if case .search = section {
+            titleLabel.text = "검색 결과"
             removeAllButton.isHidden = true
             addButton.isHidden = true
             titleLabel.snp.makeConstraints {
