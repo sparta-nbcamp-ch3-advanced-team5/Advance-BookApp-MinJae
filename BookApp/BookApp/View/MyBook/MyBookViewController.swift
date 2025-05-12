@@ -20,6 +20,7 @@ final class MyBookViewController: UIViewController {
         view.backgroundColor = .white
         setupUI()
         bind()
+        myBookCollectionView.delegate = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -53,4 +54,18 @@ final class MyBookViewController: UIViewController {
                 owner.viewModel.deleteAllBooks()
             }.disposed(by: disposeBag)
     }
+}
+
+extension MyBookViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
+            let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "trash")) { _ in
+                guard let books = try? self?.viewModel.myBooks.value() else { return }
+                let book = books[indexPaths[0].row]
+                self?.viewModel.deleteBook(book: book)
+            }
+            return UIMenu(title: "", children: [deleteAction])
+        }
+    }
+
 }
