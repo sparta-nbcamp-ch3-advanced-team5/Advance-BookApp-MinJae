@@ -11,7 +11,7 @@ import RxSwift
 final class MyBookViewModel {
     
     private let coreDataManager = CoreDataManager()
-    var myBooks = PublishSubject<[Book]>()
+    var myBooks = BehaviorSubject<[Book]>(value: [])
     
     init() {
         fetchMyBooks()
@@ -23,6 +23,11 @@ final class MyBookViewModel {
     
     func deleteAllBooks() {
         coreDataManager.deleteAll()
+        fetchMyBooks()
+    }
+    
+    func deleteBook(book: Book) {
+        coreDataManager.delete(book: book)
         fetchMyBooks()
     }
 }
