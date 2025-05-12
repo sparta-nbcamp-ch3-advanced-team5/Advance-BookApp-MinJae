@@ -10,21 +10,22 @@ import SnapKit
 
 final class BookDetailFooterView: UIView {
     
-    private let cancelButton: UIButton = {
+    let cancelButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "xmark"), for: .normal)
         button.clipsToBounds = true
-        button.layer.cornerRadius = 12
+        button.layer.cornerRadius = 16
         button.backgroundColor = .lightGray
         button.tintColor = .white
         return button
     }()
     
-    private let addButton: UIButton = {
+    let addButton: UIButton = {
         let button = UIButton()
         button.setTitle("담기", for: .normal)
+        button.titleLabel?.font = .boldSystemFont(ofSize: 20)
         button.clipsToBounds = true
-        button.layer.cornerRadius = 12
+        button.layer.cornerRadius = 16
         button.backgroundColor = .systemGreen
         button.tintColor = .white
         return button
@@ -47,13 +48,14 @@ final class BookDetailFooterView: UIView {
         cancelButton.snp.makeConstraints {
             $0.centerY.equalToSuperview()
             $0.leading.equalToSuperview().inset(15)
-            $0.width.height.equalTo(40)
+            $0.width.height.equalTo(60)
         }
         addButton.snp.makeConstraints {
             $0.centerY.equalToSuperview()
             $0.trailing.equalToSuperview().inset(15)
             $0.leading.equalTo(cancelButton.snp.trailing).offset(15)
-            $0.height.equalTo(40)
+            $0.width.greaterThanOrEqualTo(cancelButton).multipliedBy(4)
+            $0.height.equalTo(60)
         }
     }
     

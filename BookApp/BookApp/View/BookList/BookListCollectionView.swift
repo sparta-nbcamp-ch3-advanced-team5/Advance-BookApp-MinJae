@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 enum Section: Hashable {
     case search
@@ -21,6 +23,11 @@ final class BookListCollectionView: UICollectionView {
     private var datasource: DataSource?
     private var section: Section?
     private var item: [Book] = []
+    
+    private(set) var deleteAllButtonEvents = PublishSubject<Void>()
+    private(set) var addButtonEvents = PublishSubject<Void>()
+    private let disposeBag = DisposeBag()
+    
     convenience init(section: Section) {
         self.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
         self.section = section
@@ -33,6 +40,7 @@ final class BookListCollectionView: UICollectionView {
         configureDatasource()
         apply(at: .search, to: self.item)
     }
+    
     // DiffableDatasource 설정
     private func configureDatasource() {
         
@@ -49,6 +57,12 @@ final class BookListCollectionView: UICollectionView {
         //header 등록
         let headerRegistration = UICollectionView.SupplementaryRegistration<BookListCollectionHeaderView>(elementKind: UICollectionView.elementKindSectionHeader) {[unowned self] supplementaryView, elementKind, indexPath in
             supplementaryView.configure(with: self.section ?? .search)
+            supplementaryView.removeAllButton.rx.tap
+                .bind(to: deleteAllButtonEvents)
+                .disposed(by: disposeBag)
+            supplementaryView.addButton.rx.tap
+                .bind(to: addButtonEvents)
+                .disposed(by: disposeBag)
         }
         //header 설정
         self.datasource?.supplementaryViewProvider = { collectionView, elementKind, indexPath in

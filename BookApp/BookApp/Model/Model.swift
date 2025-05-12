@@ -14,9 +14,8 @@ struct Book: Hashable, Decodable {
     let description: String?
     let imageURL: String?
     
-    enum CordingKeys: String, CodingKey {
-        case title
-        case authors = "authors"
+    enum CodingKeys: String, CodingKey {
+        case title, authors
         case price = "sale_price"
         case description = "contents"
         case imageURL = "thumbnail"
