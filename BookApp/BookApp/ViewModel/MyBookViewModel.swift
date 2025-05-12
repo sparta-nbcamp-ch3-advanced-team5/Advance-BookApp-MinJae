@@ -6,7 +6,18 @@
 //
 
 import Foundation
+import RxSwift
 
 final class MyBookViewModel {
     
+    private let coreDataManager = CoreDataManager()
+    var myBooks = PublishSubject<[Book]>()
+    
+    init() {
+        fetchMyBooks()
+    }
+    
+    func fetchMyBooks() {
+        self.myBooks.onNext(coreDataManager.read())
+    }
 }
