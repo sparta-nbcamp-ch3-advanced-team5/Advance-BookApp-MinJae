@@ -20,16 +20,15 @@ final class BookListCollectionView: UICollectionView {
     
     private var datasource: DataSource?
     private var section: Section?
-    private var item = [Book]()
-    
-    convenience init(section: Section, item: [Book]) {
+    private var item: [Book] = []
+    convenience init(section: Section) {
         self.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
         self.section = section
-        self.item = item
         setupUI()
     }
     
     private func setupUI() {
+        self.showsVerticalScrollIndicator = false
         self.collectionViewLayout = createLayout()
         configureDatasource()
         apply(at: .search, to: self.item)
@@ -39,7 +38,7 @@ final class BookListCollectionView: UICollectionView {
         
         //Cell 등록
         let cellRegistration = UICollectionView.CellRegistration<BookListCollectionViewCell, [Book]> { cell, indexPath, item in
-            cell.configure(model: item[indexPath.row])
+            cell.configure(model: self.item[indexPath.row])
         }
         //Cell 설정
         self.datasource = DataSource(collectionView: self, cellProvider: { collectionView, indexPath, item in
@@ -58,17 +57,18 @@ final class BookListCollectionView: UICollectionView {
     }
     
     // Snapshot 생성 및 적용
-    private func apply(at section: Section, to item: [Book]) {
+    func apply(at section: Section, to item: [Book]) {
+        self.item = item
         var snapshot = SnapShot()
         
         if case .myBook = section {
             snapshot.appendSections([.myBook])
-            snapshot.appendItems(item, toSection: .myBook)
+            snapshot.appendItems(self.item, toSection: .myBook)
         }
         
         if case .search = section {
             snapshot.appendSections([.search])
-            snapshot.appendItems(item, toSection: .search)
+            snapshot.appendItems(self.item, toSection: .search)
         }
         
         datasource?.apply(snapshot, animatingDifferences: true)
@@ -86,10 +86,10 @@ final class BookListCollectionView: UICollectionView {
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(0.1)
         )
+        
         let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
-        section.orthogonalScrollingBehavior = .continuous
         section.interGroupSpacing = 10
         section.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
         
@@ -105,7 +105,7 @@ final class BookListCollectionView: UICollectionView {
         )
         
         section.boundarySupplementaryItems = [header]
-        
+
         return UICollectionViewCompositionalLayout(section: section)
     }
 }

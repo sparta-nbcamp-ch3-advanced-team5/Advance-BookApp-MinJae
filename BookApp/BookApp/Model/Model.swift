@@ -7,10 +7,22 @@
 
 import Foundation
 
-struct Book: Hashable {
+struct Book: Hashable, Decodable {
     let title: String
-    let author: String
-    let price: String
-    let description: String = ""
-    let imageURL: String = ""
+    let authors: [String]
+    let price: Int
+    let description: String?
+    let imageURL: String?
+    
+    enum CordingKeys: String, CodingKey {
+        case title
+        case authors = "authors"
+        case price = "sale_price"
+        case description = "contents"
+        case imageURL = "thumbnail"
+    }
+}
+
+struct BookResponse: Hashable, Decodable {
+    let documents: [Book]
 }
