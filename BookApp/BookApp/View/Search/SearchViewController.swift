@@ -16,6 +16,7 @@ final class SearchViewController: UIViewController {
     private let searchResultView: BookListCollectionView
     private let disposeBag = DisposeBag()
     private let viewModel = SearchViewModel()
+    private let popupView = SearchPopupView()
     
     init() {
         self.searchResultView = BookListCollectionView(section: .search)
@@ -36,9 +37,13 @@ final class SearchViewController: UIViewController {
     
     private func bind() {
         searchResultView.rx.itemSelected
-            .subscribe(onNext: { [weak self] indexPath in
-                let book = self?.viewModel.item[indexPath.row]
-                self?.present(BookDetailViewController(book: book!), animated: true)
+            .withUnretained(self)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { owner, indexPath in
+                let book = owner.viewModel.item[indexPath.row]
+                let detailVC = BookDetailViewController(book: book)
+                detailVC.delegate = self
+                owner.present(detailVC, animated: true)
             })
             .disposed(by: disposeBag)
         
@@ -52,7 +57,7 @@ final class SearchViewController: UIViewController {
     }
 
     private func setupUI() {
-        [searchBar, searchResultView].forEach {
+        [searchBar, searchResultView, popupView].forEach {
             view.addSubview($0)
         }
         
@@ -65,6 +70,13 @@ final class SearchViewController: UIViewController {
             $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
             $0.top.equalTo(searchBar.snp.bottom)
         }
+        
+        popupView.snp.makeConstraints {
+            $0.width.equalToSuperview().multipliedBy(0.9)
+            $0.height.equalTo(40)
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(5)
+        }
     }
 }
 
@@ -73,5 +85,24 @@ extension SearchViewController: UISearchBarDelegate {
         searchBar.resignFirstResponder()
         guard let text = searchBar.text else { return }
         viewModel.fetchBooks(query: text)
+    }
+}
+
+extension SearchViewController: BookDetailViewControllerDelegate {
+    func addButtonTapped(book: Book) {
+        popupView.configureLabelText(title: book.title)
+        popupView.isHidden = false
+        popupView.snp.updateConstraints {
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
+        }
+        UIView.animate(withDuration: 2.0) { [unowned self] in
+            self.view.layoutIfNeeded()
+        } completion: { bool in
+            self.popupView.isHidden = true
+            self.popupView.snp.updateConstraints {
+                $0.bottom.equalTo(self.view.safeAreaLayoutGuide)
+            }
+        }
+        
     }
 }
