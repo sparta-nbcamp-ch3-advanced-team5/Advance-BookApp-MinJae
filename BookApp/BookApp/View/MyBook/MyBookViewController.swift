@@ -36,6 +36,7 @@ final class MyBookViewController: UIViewController {
     }
     
     private func bind() {
+        // 담긴 책 리스트 바인딩
         viewModel.myBooks
             .observe(on: MainScheduler.instance)
             .withUnretained(self)
@@ -43,5 +44,13 @@ final class MyBookViewController: UIViewController {
                 owner.myBookCollectionView.apply(at: .myBook, to: books)
             }
             .disposed(by: disposeBag)
+        
+        // 전체 삭제 버튼 바인딩
+        myBookCollectionView.deleteAllButtonEvents
+            .withUnretained(self)
+            .observe(on: MainScheduler.instance)
+            .subscribe{ owner, event in
+                owner.viewModel.deleteAllBooks()
+            }.disposed(by: disposeBag)
     }
 }

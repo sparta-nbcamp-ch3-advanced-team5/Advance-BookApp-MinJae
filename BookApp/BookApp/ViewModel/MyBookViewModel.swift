@@ -20,4 +20,9 @@ final class MyBookViewModel {
     func fetchMyBooks() {
         self.myBooks.onNext(coreDataManager.read())
     }
+    
+    func deleteAllBooks() {
+        coreDataManager.deleteAll()
+        fetchMyBooks()
+    }
 }
