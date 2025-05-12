@@ -25,6 +25,7 @@ final class BookListCollectionView: UICollectionView {
     private var item: [Book] = []
     
     private(set) var deleteAllButtonEvents = PublishSubject<Void>()
+    private(set) var addButtonEvents = PublishSubject<Void>()
     private let disposeBag = DisposeBag()
     
     convenience init(section: Section) {
@@ -58,6 +59,9 @@ final class BookListCollectionView: UICollectionView {
             supplementaryView.configure(with: self.section ?? .search)
             supplementaryView.removeAllButton.rx.tap
                 .bind(to: deleteAllButtonEvents)
+                .disposed(by: disposeBag)
+            supplementaryView.addButton.rx.tap
+                .bind(to: addButtonEvents)
                 .disposed(by: disposeBag)
         }
         //header 설정
