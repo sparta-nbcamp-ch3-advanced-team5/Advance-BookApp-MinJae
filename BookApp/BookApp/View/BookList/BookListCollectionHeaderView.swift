@@ -80,6 +80,17 @@ final class BookListCollectionHeaderView: UICollectionReusableView {
                 $0.leading.equalToSuperview()
             }
         }
+        
+        if case .recent = section {
+            titleLabel.text = "최근 본 책"
+            removeAllButton.isHidden = true
+            addButton.isHidden = true
+            titleLabel.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.leading.equalToSuperview()
+            }
+        }
+        
     }
     
 }
