@@ -9,11 +9,16 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-enum Section: Hashable {
+enum CollectionType {
     case search
     case myBook
 }
 
+enum Section: Hashable {
+    case search
+    case myBook
+    case recent
+}
 final class BookListCollectionView: UICollectionView {
     
     // DiffableDataSource
@@ -21,14 +26,13 @@ final class BookListCollectionView: UICollectionView {
     typealias SnapShot = NSDiffableDataSourceSnapshot<Section, Book>
     
     private var datasource: DataSource?
-    private var section: Section?
-    private var item: [Book] = []
+    private var section: CollectionType?
     
     private(set) var deleteAllButtonEvents = PublishSubject<Void>()
     private(set) var addButtonEvents = PublishSubject<Void>()
     private let disposeBag = DisposeBag()
     
-    convenience init(section: Section) {
+    convenience init(section: CollectionType) {
         self.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
         self.section = section
         setupUI()
@@ -38,25 +42,36 @@ final class BookListCollectionView: UICollectionView {
         self.showsVerticalScrollIndicator = false
         self.collectionViewLayout = createLayout()
         configureDatasource()
-        apply(at: .search, to: self.item)
     }
     
     // DiffableDatasource 설정
     private func configureDatasource() {
         
         //Cell 등록
-        let cellRegistration = UICollectionView.CellRegistration<BookListCollectionViewCell, [Book]> { cell, indexPath, item in
-            cell.configure(model: self.item[indexPath.row])
+        let cellRegistration = UICollectionView.CellRegistration<BookListCollectionViewCell, Book> { cell, indexPath, item in
+            cell.configure(model: item)
         }
         //Cell 설정
         self.datasource = DataSource(collectionView: self, cellProvider: { collectionView, indexPath, item in
-            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: [item])
+            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
             return cell
         })
         
         //header 등록
         let headerRegistration = UICollectionView.SupplementaryRegistration<BookListCollectionHeaderView>(elementKind: UICollectionView.elementKindSectionHeader) {[unowned self] supplementaryView, elementKind, indexPath in
-            supplementaryView.configure(with: self.section ?? .search)
+            if self.section == .myBook {
+                supplementaryView.configure(with: .myBook)
+            } else if self.section == .search {
+                if indexPath.count == 1 {
+                    supplementaryView.configure(with: .search)
+                } else {
+                    if indexPath.section == 0 {
+                        supplementaryView.configure(with: .recent)
+                    } else if indexPath.section == 1 {
+                        supplementaryView.configure(with: .search)
+                    }
+                }
+            }
             supplementaryView.removeAllButton.rx.tap
                 .bind(to: deleteAllButtonEvents)
                 .disposed(by: disposeBag)
@@ -71,20 +86,22 @@ final class BookListCollectionView: UICollectionView {
     }
     
     // Snapshot 생성 및 적용
-    func apply(at section: Section, to item: [Book]) {
-        self.item = item
+    func apply(at section: Section, item: [Book], recentItem: [Book] = []) {
         var snapshot = SnapShot()
         
         if case .myBook = section {
             snapshot.appendSections([.myBook])
-            snapshot.appendItems(self.item, toSection: .myBook)
+            snapshot.appendItems(item, toSection: .myBook)
+        } else {
+            snapshot.appendSections([.recent, .search])
+            if case .search = section {
+                snapshot.appendItems(item, toSection: .search)
+            }
+            
+            if case .recent = section {
+                snapshot.appendItems(recentItem, toSection: .recent)
+            }
         }
-        
-        if case .search = section {
-            snapshot.appendSections([.search])
-            snapshot.appendItems(self.item, toSection: .search)
-        }
-        
         datasource?.apply(snapshot, animatingDifferences: true)
     }
     
