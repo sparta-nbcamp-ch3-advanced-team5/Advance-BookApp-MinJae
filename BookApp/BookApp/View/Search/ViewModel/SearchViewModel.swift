@@ -40,12 +40,28 @@ final class SearchViewModel {
                 }).disposed(by: disposeBag)
         }
     }
-    
-    func appendRecentBook(_ book: Book) {
-        var recentBook = book
-        recentBook.isRecent = true
-        if recentBooksArray.contains(recentBook) { return }
-        recentBooks.onNext(recentBooksArray + [recentBook])
+    // 최근기록 추가
+    func appendRecentBook(_ book: inout Book) {
+        // DiffableDataSource에서 셀은 고유해야하므로 isRecent 값 변경하여 저장, 다른곳에선 안쓰인다.
+        book.isRecent = true
+        
+        // 이미 최근 기록에 있는지 판단
+        if recentBooksArray.contains(book) {
+            // 가장 첫번째에 존재하면 재배치 과정 스킵
+            if recentBooksArray[0] == book { return }
+            // 이미 최근기록에 있지만 첫번째에 배치되어 있지 않다면 첫번째로 재배치
+            var currentRecentBooks = self.recentBooksArray
+            for i in 0..<currentRecentBooks.count {
+                if book == currentRecentBooks[i] {
+                    currentRecentBooks.remove(at: i)
+                    break
+                }
+            }
+            recentBooks.onNext([book] + currentRecentBooks)
+            return
+        }
+        // 최근기록에 없다면 추가
+        recentBooks.onNext([book] + recentBooksArray)
     }
     
 }

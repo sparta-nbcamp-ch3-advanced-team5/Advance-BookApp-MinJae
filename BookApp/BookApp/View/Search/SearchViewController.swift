@@ -36,6 +36,7 @@ final class SearchViewController: UIViewController {
     }
     
     private func bind() {
+        // 검색결과 컬렉션 뷰의 셀 선택 이벤트 바인딩
         searchResultView.rx.itemSelected
             .withUnretained(self)
             .observe(on: MainScheduler.instance)
@@ -50,7 +51,7 @@ final class SearchViewController: UIViewController {
                 let detailVC = BookDetailViewController(book: book!)
                 detailVC.delegate = self
                 owner.present(detailVC, animated: true)
-                owner.viewModel.appendRecentBook(book!)
+                owner.viewModel.appendRecentBook(&book!)
             })
             .disposed(by: disposeBag)
         
