@@ -30,6 +30,7 @@ final class SearchViewModel {
         self.networkManager = networkManager
     }
     
+    // 데이터 불러오기
     func fetchBooks(query: String) {
         Task {
             await networkManager.fetch(query: query)

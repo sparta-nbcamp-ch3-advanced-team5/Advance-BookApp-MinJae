@@ -34,7 +34,7 @@ final class SearchViewController: UIViewController {
         bind()
         searchBar.delegate = self
     }
-    
+    // 바인딩
     private func bind() {
         // 검색결과 컬렉션 뷰의 셀 선택 이벤트 바인딩
         searchResultView.rx.itemSelected
@@ -55,6 +55,7 @@ final class SearchViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
+        // 데이터가 성공적으로 불러오면 UI 반영
         viewModel.fetchedBooks
             .withUnretained(self)
             .observe(on: MainScheduler.instance)
@@ -63,6 +64,7 @@ final class SearchViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
+        // 최근기록 UI 반영
         viewModel.recentBooks
             .withUnretained(self)
             .observe(on: MainScheduler.instance)
@@ -72,7 +74,7 @@ final class SearchViewController: UIViewController {
                 owner.searchResultView.apply(at: .recent, to: fetchedBooks, recentItem: recentBooks)
             }.disposed(by: disposeBag)
     }
-
+    // UI 구성 (설정 변경, View 추가, 레이아웃 설정)
     private func setupUI() {
         [searchBar, searchResultView, popupView].forEach {
             view.addSubview($0)
@@ -95,12 +97,13 @@ final class SearchViewController: UIViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(5)
         }
     }
-    
+    // 검색바 활성화
     func activeSearchbar() {
         searchBar.becomeFirstResponder()
     }
 }
 
+// MARK: UISearchBarDelegate
 extension SearchViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
@@ -109,7 +112,9 @@ extension SearchViewController: UISearchBarDelegate {
     }
 }
 
+// MARK: BookDetailViewControllerDelegate
 extension SearchViewController: BookDetailViewControllerDelegate {
+    // 상세페이지에서 담기버튼 클릭 시 팝업뷰 보여지도록 설정
     func addButtonTapped(book: Book) {
         popupView.configureLabelText(title: book.title)
         popupView.isHidden = false

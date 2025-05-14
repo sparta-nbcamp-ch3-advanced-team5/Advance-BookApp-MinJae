@@ -26,6 +26,7 @@ enum Section: Hashable {
 final class BookListCollectionView: UICollectionView {
     
     // DiffableDataSource
+    // MARK: TODO - Presentation Layer에서 Entity인 Book 데이터모델을 알고 있어도 되는가?
     typealias DataSource = UICollectionViewDiffableDataSource<Section, Book>
     typealias SnapShot = NSDiffableDataSourceSnapshot<Section, Book>
     
@@ -43,7 +44,7 @@ final class BookListCollectionView: UICollectionView {
         self.section = section
         setupUI()
     }
-    
+    // UI 구성 (설정 변경, View 추가, 레이아웃 설정)
     private func setupUI() {
         self.collectionViewLayout = createLayout()
         configureDatasource()

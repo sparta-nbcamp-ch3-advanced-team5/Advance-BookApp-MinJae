@@ -10,6 +10,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+// 상세페이지 델리게이트 프로토콜
 protocol BookDetailViewControllerDelegate: AnyObject {
     func addButtonTapped(book: Book)
 }
@@ -20,6 +21,7 @@ final class BookDetailViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private let viewModel: BookDetailViewModel
     
+    // 델리게이트, 검색페이지에서 팝업뷰 띄우기 위해 위임자 구성
     weak var delegate: BookDetailViewControllerDelegate?
     
     init(book: Book) {
@@ -38,7 +40,7 @@ final class BookDetailViewController: UIViewController {
         setupUI()
         bind()
     }
-    
+    // UI 구성 (설정 변경, View 추가, 레이아웃 설정)
     private func setupUI() {
         view.addSubview(bookDetailView)
         
@@ -63,7 +65,7 @@ final class BookDetailViewController: UIViewController {
             .subscribe{ owner, event in
                 owner.viewModel.saveBook()
                 owner.dismiss(animated: true)
-                owner.delegate?.addButtonTapped(book: owner.viewModel.item)
+                owner.delegate?.addButtonTapped(book: owner.viewModel.item) // 검색페이지에 책 데이터 전달
             }
             .disposed(by: disposeBag)
     }
