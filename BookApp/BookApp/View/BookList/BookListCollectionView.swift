@@ -187,6 +187,7 @@ private extension BookListCollectionView {
         let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 20, bottom: 15, trailing: 20)
         section.interGroupSpacing = 10
         
         return section
@@ -202,18 +203,7 @@ private extension BookListCollectionView {
         let section = NSCollectionLayoutSection(group: group)
         section.interGroupSpacing = 16
         section.orthogonalScrollingBehavior = .continuous
-        
-        let headerSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(40)
-        )
-        
-        let header = NSCollectionLayoutBoundarySupplementaryItem(
-            layoutSize: headerSize,
-            elementKind: UICollectionView.elementKindSectionHeader,
-            alignment: .top
-        )
-        section.boundarySupplementaryItems = [header]
+        section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 20, bottom: 20, trailing: 20)
         
         return section
     }

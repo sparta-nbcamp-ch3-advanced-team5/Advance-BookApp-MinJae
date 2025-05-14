@@ -84,7 +84,7 @@ final class SearchViewController: UIViewController {
         
         searchResultView.snp.makeConstraints {
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
-            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
+            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide)
             $0.top.equalTo(searchBar.snp.bottom)
         }
         
