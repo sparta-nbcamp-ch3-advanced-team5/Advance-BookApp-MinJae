@@ -40,10 +40,17 @@ final class SearchViewController: UIViewController {
             .withUnretained(self)
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { owner, indexPath in
-                let book = owner.viewModel.item[indexPath.row]
-                let detailVC = BookDetailViewController(book: book)
+                var book: Book?
+                if indexPath.section == 0 {
+                    book = owner.viewModel.recentBooksArray[indexPath.row]
+                } else if indexPath.section == 1 {
+                    book = owner.viewModel.fetchedBooksArray[indexPath.row]
+                }
+                if book == nil { return }
+                let detailVC = BookDetailViewController(book: book!)
                 detailVC.delegate = self
                 owner.present(detailVC, animated: true)
+                owner.viewModel.appendRecentBook(book!)
             })
             .disposed(by: disposeBag)
         
@@ -54,6 +61,15 @@ final class SearchViewController: UIViewController {
                 owner.searchResultView.apply(at: .search, to: books)
             })
             .disposed(by: disposeBag)
+        
+        viewModel.recentBooks
+            .withUnretained(self)
+            .observe(on: MainScheduler.instance)
+            .subscribe { owner, books in
+                let fetchedBooks = owner.viewModel.fetchedBooksArray
+                let recentBooks = owner.viewModel.recentBooksArray
+                owner.searchResultView.apply(at: .recent, to: fetchedBooks, recentItem: recentBooks)
+            }.disposed(by: disposeBag)
     }
 
     private func setupUI() {

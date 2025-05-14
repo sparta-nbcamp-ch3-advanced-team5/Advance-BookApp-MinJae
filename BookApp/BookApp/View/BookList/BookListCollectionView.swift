@@ -86,7 +86,7 @@ final class BookListCollectionView: UICollectionView {
     }
     
     // Snapshot 생성 및 적용
-    func apply(at section: Section, item: [Book], recentItem: [Book] = []) {
+    func apply(at section: Section, to item: [Book], recentItem: [Book] = []) {
         var snapshot = SnapShot()
         
         if case .myBook = section {
@@ -97,8 +97,8 @@ final class BookListCollectionView: UICollectionView {
             if case .search = section {
                 snapshot.appendItems(item, toSection: .search)
             }
-            
             if case .recent = section {
+                snapshot.appendItems(item, toSection: .search)
                 snapshot.appendItems(recentItem, toSection: .recent)
             }
         }
@@ -139,6 +139,9 @@ final class BookListCollectionView: UICollectionView {
 
         return UICollectionViewCompositionalLayout(section: section)
     }
+    
+//    private func createRecentSectionLayout() -> UICollectionViewLayout {
+//    }
 }
 
 

@@ -13,6 +13,7 @@ struct Book: Hashable, Decodable {
     let price: Int
     let description: String?
     let imageURL: String?
+    var isRecent: Bool = false
     
     enum CodingKeys: String, CodingKey {
         case title, authors
