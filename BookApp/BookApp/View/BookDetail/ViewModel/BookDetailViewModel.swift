@@ -16,6 +16,18 @@ final class BookDetailViewModel {
     }
     
     func saveBook() {
+        if duplicationValidation() { return }
         coreDataManager.create(to: item)
+    }
+    
+    private func duplicationValidation() -> Bool {
+        let currentSavedData = coreDataManager.read()
+        let newBook = Book(title: item.title,
+                           authors: item.authors,
+                           price: item.price,
+                           description: nil,
+                           imageURL: nil,
+                           isRecent: false)
+        return currentSavedData.contains(newBook)
     }
 }
