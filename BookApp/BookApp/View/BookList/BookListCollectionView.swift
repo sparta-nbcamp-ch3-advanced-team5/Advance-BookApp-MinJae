@@ -45,7 +45,6 @@ final class BookListCollectionView: UICollectionView {
     }
     
     private func setupUI() {
-        self.showsVerticalScrollIndicator = false
         self.collectionViewLayout = createLayout()
         configureDatasource()
     }
