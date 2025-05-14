@@ -88,22 +88,21 @@ private extension BookListCollectionView {
         //Cell 설정
         self.datasource = DataSource(collectionView: self, cellProvider: { collectionView, indexPath, item in
             
-            let listCell = collectionView.dequeueConfiguredReusableCell(using: listCellRegistration, for: indexPath, item: item)
-            let recentCell = collectionView.dequeueConfiguredReusableCell(using: recentCellRegistration, for: indexPath, item: item)
-            
+            var cell = UICollectionViewCell()
             // 컬렉션 뷰가 위치한 페이지(검색, 마이북)에 따라 셀 다르게 구성
             switch self.section {
             case .myBook:
-                return listCell
+                cell = collectionView.dequeueConfiguredReusableCell(using: listCellRegistration, for: indexPath, item: item)
             case .search:
                 if indexPath.section == 0 {
-                    return recentCell
+                    cell = collectionView.dequeueConfiguredReusableCell(using: recentCellRegistration, for: indexPath, item: item)
                 } else {
-                    return listCell
+                    cell = collectionView.dequeueConfiguredReusableCell(using: listCellRegistration, for: indexPath, item: item)
                 }
             default:
-                return listCell
+                break
             }
+            return cell
         })
         
         //header 등록
