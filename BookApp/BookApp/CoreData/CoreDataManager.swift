@@ -8,8 +8,16 @@
 import UIKit
 import CoreData
 
-enum CoreDatakey {
-    static let bookEntityName = "MyBook"
+// 코어데이터 엔티티 이름
+enum CoreDataEntity {
+    static let MyBook = "MyBook"
+}
+
+// MyBook 엔티티 키
+enum MyBookKey {
+    static let title = "title"
+    static let author = "author"
+    static let price = "price"
 }
 
 final class CoreDataManager {
@@ -19,11 +27,11 @@ final class CoreDataManager {
     
     // CREATE
     func create(to book: Book) {
-        guard let entity = NSEntityDescription.entity(forEntityName: CoreDatakey.bookEntityName, in: context) else { return }
+        guard let entity = NSEntityDescription.entity(forEntityName: CoreDataEntity.MyBook, in: context) else { return }
         let newBook = NSManagedObject(entity: entity, insertInto: context)
-        newBook.setValue(book.title, forKey: "title")
-        newBook.setValue(book.authors.joined(separator: ", "), forKey: "author")
-        newBook.setValue(book.price, forKey: "price")
+        newBook.setValue(book.title, forKey: MyBookKey.title)
+        newBook.setValue(book.authors.joined(separator: ", "), forKey: MyBookKey.author)
+        newBook.setValue(book.price, forKey: MyBookKey.price)
         
         do {
             try context.save()
