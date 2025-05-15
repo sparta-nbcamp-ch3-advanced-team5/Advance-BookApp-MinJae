@@ -39,24 +39,13 @@ final class CoreDataManager {
     
     // READ
     func read(for entityModel: CoreDataEntity) -> [Book] {
-        var objectType: NSManagedObject.Type?
         
-        if case .myBook = entityModel {
-            objectType = entityModel.myBookObject.type
-        }
-        if case .recentBook = entityModel {
-            objectType = entityModel.recentBookObject.type
-        }
-        
-        guard let type = objectType else {
-            print("Type Casting Error")
-            return []
-        }
+        guard let entityType = entityModel.object.type as? NSManagedObject.Type else { return [] }
         
         let keys = entityModel.object.keys
         
         do {
-            let books = try context.fetch(type.fetchRequest())
+            let books = try context.fetch(entityType.fetchRequest())
             var result = [Book]()
             if let datas = books as? [NSManagedObject] {
                 for element in datas {
@@ -86,15 +75,17 @@ final class CoreDataManager {
     }
     
     // DELETE
-    func delete(book: Book) {
-        let request = MyBook.fetchRequest()
+    func delete(entityModel: CoreDataEntity, book: Book) {
+        guard let entityType = entityModel.object.type as? NSManagedObject.Type else { return }
+        
+        let request = entityType.fetchRequest()
         request.predicate = NSPredicate(format: "title == %@", book.title)
         
         do {
             let result = try context.fetch(request)
             
             for element in result {
-                context.delete(element)
+                context.delete(element as! NSManagedObject)
             }
             try context.save()
         } catch {

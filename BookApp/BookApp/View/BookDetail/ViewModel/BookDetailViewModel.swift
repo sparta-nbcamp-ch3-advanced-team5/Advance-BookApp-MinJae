@@ -19,11 +19,11 @@ final class BookDetailViewModel {
     // 책 코어데이터에 저장
     func saveBook() {
         if duplicationValidation() { return }
-        coreDataManager.create(to: item)
+        coreDataManager.create(for: .myBook, to: item)
     }
     // 담긴 책에 이미 저장되어 있는지 판단
     private func duplicationValidation() -> Bool {
-        let currentSavedData = coreDataManager.read()
+        let currentSavedData = coreDataManager.read(for: .myBook)
         let newBook = Book(title: item.title,
                            authors: item.authors,
                            price: item.price,
