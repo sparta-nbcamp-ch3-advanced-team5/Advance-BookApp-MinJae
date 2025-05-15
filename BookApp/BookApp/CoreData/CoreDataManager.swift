@@ -75,7 +75,7 @@ final class CoreDataManager {
     }
     
     // DELETE
-    func delete(entityModel: CoreDataEntity, book: Book) {
+    func delete(for entityModel: CoreDataEntity, book: Book) {
         guard let entityType = entityModel.object.type as? NSManagedObject.Type else { return }
         
         let request = entityType.fetchRequest()
@@ -85,7 +85,8 @@ final class CoreDataManager {
             let result = try context.fetch(request)
             
             for element in result {
-                context.delete(element as! NSManagedObject)
+                guard let unwrapped = element as? NSManagedObject else { continue }
+                context.delete(unwrapped)
             }
             try context.save()
         } catch {
@@ -94,11 +95,13 @@ final class CoreDataManager {
     }
     
     // DELETE ALL
-    func deleteAll() {
+    func deleteAll(for entityModel: CoreDataEntity) {
+        guard let entityType = entityModel.object.type as? NSManagedObject.Type else { return }
         do {
-            let result = try context.fetch(MyBook.fetchRequest())
+            let result = try context.fetch(entityType.fetchRequest())
             for element in result {
-                context.delete(element)
+                guard let unwrapped = element as? NSManagedObject else { continue }
+                context.delete(unwrapped)
             }
             try context.save()
         } catch {

@@ -30,14 +30,6 @@ enum CoreDataEntity {
             return RecentBookCoreDataModelImpl()
         }
     }
-    
-    // MARK: type의 구체적인 정보를 얻기 위해 some 타입으로 리턴
-    var myBookObject: some Entityable {
-        return MyBookCoreDataModelImpl()
-    }
-    var recentBookObject: some Entityable {
-        return RecentBookCoreDataModelImpl()
-    }
 }
 
 // MyBook 엔티티 키
