@@ -50,7 +50,7 @@ final class BookDetailStackView: UIStackView {
         setupUI()
         configure(with: book)
     }
-    
+    // UI 구성 (설정 변경, View 추가, 레이아웃 설정)
     private func setupUI() {
         self.axis = .vertical
         self.distribution = .fill

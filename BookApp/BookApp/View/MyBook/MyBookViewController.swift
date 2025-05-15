@@ -11,7 +11,7 @@ import RxSwift
 
 final class MyBookViewController: UIViewController {
 
-    let myBookCollectionView = BookListCollectionView(section: .myBook)
+    private(set) var myBookCollectionView = BookListCollectionView(section: .myBook)
     private let viewModel = MyBookViewModel()
     private let disposeBag = DisposeBag()
     
@@ -26,7 +26,7 @@ final class MyBookViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         viewModel.fetchMyBooks()
     }
-    
+    // UI 구성 (설정 변경, View 추가, 레이아웃 설정)
     private func setupUI() {
         view.addSubview(myBookCollectionView)
         
@@ -35,7 +35,7 @@ final class MyBookViewController: UIViewController {
             $0.leading.trailing.equalToSuperview().inset(20)
         }
     }
-    
+    // 바인딩
     private func bind() {
         // 담긴 책 리스트 바인딩
         viewModel.myBooks
@@ -56,7 +56,9 @@ final class MyBookViewController: UIViewController {
     }
 }
 
+// MARK: - CollectionViewDelegate
 extension MyBookViewController: UICollectionViewDelegate {
+    // 스와이프 대신 셀 꾹 선택 시 UIMenu가 나오고 삭제 버튼 클릭 가능
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
             let deleteAction = UIAction(title: "Delete", image: UIImage(systemName: "trash")) { _ in

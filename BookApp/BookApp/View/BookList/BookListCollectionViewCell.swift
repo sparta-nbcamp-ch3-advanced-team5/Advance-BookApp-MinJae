@@ -40,7 +40,7 @@ final class BookListCollectionViewCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+    // UI 구성 (설정 변경, View 추가, 레이아웃 설정)
     private func setupUI() {
         [bookTitleLabel, authorLabel, priceLabel].forEach {
             contentView.addSubview($0)
@@ -64,7 +64,7 @@ final class BookListCollectionViewCell: UICollectionViewCell {
             $0.width.greaterThanOrEqualTo(40)
         }
     }
-    
+    // 입력받은 데이터로 UI 그리기
     func configure(model: Book) {
         self.bookTitleLabel.text = model.title
         self.authorLabel.text = model.authors.joined(separator: ", ")

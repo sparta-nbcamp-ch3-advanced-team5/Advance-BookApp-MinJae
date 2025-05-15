@@ -39,7 +39,7 @@ final class BookDetailFooterView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+    // UI 구성 (설정 변경, View 추가, 레이아웃 설정)
     private func setupUI() {
         [cancelButton, addButton].forEach {
             self.addSubview($0)

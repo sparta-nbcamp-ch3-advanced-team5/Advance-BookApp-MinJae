@@ -34,28 +34,41 @@ final class SearchViewController: UIViewController {
         bind()
         searchBar.delegate = self
     }
-    
+    // 바인딩
     private func bind() {
+        // 검색결과 컬렉션 뷰의 셀 선택 이벤트 바인딩
         searchResultView.rx.itemSelected
             .withUnretained(self)
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { owner, indexPath in
-                let book = owner.viewModel.item[indexPath.row]
-                let detailVC = BookDetailViewController(book: book)
+                var book: Book?
+                if indexPath.section == 0 {
+                    if owner.viewModel.recentBooksArray.isEmpty {
+                        book = owner.viewModel.fetchedBooksArray[indexPath.row]
+                    } else {
+                        book = owner.viewModel.recentBooksArray[indexPath.row]
+                    }
+                } else if indexPath.section == 1 {
+                    book = owner.viewModel.fetchedBooksArray[indexPath.row]
+                }
+                if book == nil { return }
+                let detailVC = BookDetailViewController(book: book!)
                 detailVC.delegate = self
                 owner.present(detailVC, animated: true)
+                owner.viewModel.appendRecentBook(&book!)
             })
             .disposed(by: disposeBag)
         
-        viewModel.fetchedBooks
-            .withUnretained(self)
+        // 검색 또는 상세페이지 진입 시 컬렉션 뷰 업데이트
+        Observable
+            .combineLatest(viewModel.fetchedBooks, viewModel.recentBooks)
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { owner, books in
-                owner.searchResultView.apply(at: .search, to: books)
-            })
-            .disposed(by: disposeBag)
+            .withUnretained(self)
+            .subscribe{ (owner, books) in
+                owner.searchResultView.apply(at: .recent, to: books.0, recentItem: books.1)
+            }.disposed(by: disposeBag)
     }
-
+    // UI 구성 (설정 변경, View 추가, 레이아웃 설정)
     private func setupUI() {
         [searchBar, searchResultView, popupView].forEach {
             view.addSubview($0)
@@ -67,7 +80,7 @@ final class SearchViewController: UIViewController {
         
         searchResultView.snp.makeConstraints {
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
-            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
+            $0.leading.trailing.equalTo(view.safeAreaLayoutGuide)
             $0.top.equalTo(searchBar.snp.bottom)
         }
         
@@ -78,12 +91,13 @@ final class SearchViewController: UIViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(5)
         }
     }
-    
+    // 검색바 활성화
     func activeSearchbar() {
         searchBar.becomeFirstResponder()
     }
 }
 
+// MARK: UISearchBarDelegate
 extension SearchViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
@@ -92,7 +106,9 @@ extension SearchViewController: UISearchBarDelegate {
     }
 }
 
+// MARK: BookDetailViewControllerDelegate
 extension SearchViewController: BookDetailViewControllerDelegate {
+    // 상세페이지에서 담기버튼 클릭 시 팝업뷰 보여지도록 설정
     func addButtonTapped(book: Book) {
         popupView.configureLabelText(title: book.title)
         popupView.isHidden = false

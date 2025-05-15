@@ -17,17 +17,19 @@ final class MyBookViewModel {
         fetchMyBooks()
     }
     
+    // 코어데이터에 저장된 담긴 책 데이터 불러오기
     func fetchMyBooks() {
-        self.myBooks.onNext(coreDataManager.read())
+        self.myBooks.onNext(coreDataManager.read(for: .myBook))
     }
     
+    // 코어데이터에 저장된 담긴 책 데이터 모두 삭제
     func deleteAllBooks() {
-        coreDataManager.deleteAll()
+        coreDataManager.deleteAll(for: .myBook)
         fetchMyBooks()
     }
-    
+    // 코어데이터에 저장된 데이터에서 파라미터로 입력받은 데이터 삭제
     func deleteBook(book: Book) {
-        coreDataManager.delete(book: book)
+        coreDataManager.delete(for: .myBook, book: book)
         fetchMyBooks()
     }
 }
