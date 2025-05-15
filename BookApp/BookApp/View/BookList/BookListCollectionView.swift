@@ -42,15 +42,15 @@ final class BookListCollectionView: UICollectionView {
     convenience init(section: CollectionType) {
         self.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
         self.section = section
-        setupUI()
     }
     // UI 구성 (설정 변경, View 추가, 레이아웃 설정)
-    private func setupUI() {
-        self.collectionViewLayout = createLayout()
-        configureDatasource()
+    private func setupUI(isRecentItemEmpty: Bool) {
+        self.collectionViewLayout = createLayout(isRecentItemEmpty: isRecentItemEmpty)
+        configureDatasource(isRecentItemEmpty: isRecentItemEmpty)
     }
     // Snapshot 생성 및 적용
     func apply(at section: Section, to item: [Book], recentItem: [Book] = []) {
+        setupUI(isRecentItemEmpty: recentItem.isEmpty)
         var snapshot = SnapShot()
         
         if case .myBook = section {
@@ -65,6 +65,9 @@ final class BookListCollectionView: UICollectionView {
                 snapshot.appendItems(item, toSection: .search)
                 snapshot.appendItems(recentItem, toSection: .recent)
             }
+            
+            item.isEmpty ? snapshot.deleteSections([.search]) : nil
+            recentItem.isEmpty ? snapshot.deleteSections([.recent]) : nil
         }
         datasource?.apply(snapshot, animatingDifferences: true)
     }
@@ -74,7 +77,7 @@ final class BookListCollectionView: UICollectionView {
 // MARK: DiffableDataSource Configure
 private extension BookListCollectionView {
     // DiffableDatasource 설정
-    private func configureDatasource() {
+    private func configureDatasource(isRecentItemEmpty: Bool) {
         // Cell 생성
         // 리스트 셀
         let listCellRegistration = UICollectionView.CellRegistration<BookListCollectionViewCell, Book> { cell, indexPath, item in
@@ -94,10 +97,14 @@ private extension BookListCollectionView {
             case .myBook:
                 cell = collectionView.dequeueConfiguredReusableCell(using: listCellRegistration, for: indexPath, item: item)
             case .search:
-                if indexPath.section == 0 {
-                    cell = collectionView.dequeueConfiguredReusableCell(using: recentCellRegistration, for: indexPath, item: item)
-                } else {
+                if isRecentItemEmpty {
                     cell = collectionView.dequeueConfiguredReusableCell(using: listCellRegistration, for: indexPath, item: item)
+                } else {
+                    if indexPath.section == 0 {
+                        cell = collectionView.dequeueConfiguredReusableCell(using: recentCellRegistration, for: indexPath, item: item)
+                    } else {
+                        cell = collectionView.dequeueConfiguredReusableCell(using: listCellRegistration, for: indexPath, item: item)
+                    }
                 }
             default:
                 break
@@ -112,7 +119,7 @@ private extension BookListCollectionView {
             if self.section == .myBook {
                 supplementaryView.configure(with: .myBook)
             } else if self.section == .search {
-                if indexPath.count == 1 {
+                if isRecentItemEmpty {
                     supplementaryView.configure(with: .search)
                 } else {
                     if indexPath.section == 0 {
@@ -140,7 +147,7 @@ private extension BookListCollectionView {
 
 // MARK: CompositionalLayout Configure
 private extension BookListCollectionView {
-    func createLayout() -> UICollectionViewCompositionalLayout {
+    func createLayout(isRecentItemEmpty: Bool) -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout { sectionIndex, environment -> NSCollectionLayoutSection in
             
             let headerSize = NSCollectionLayoutSize(
@@ -161,6 +168,11 @@ private extension BookListCollectionView {
                     section.boundarySupplementaryItems = [header]
                     return section
                 } else {
+                    if isRecentItemEmpty {
+                        let section = self.createListCellLayout()
+                        section.boundarySupplementaryItems = [header]
+                        return section
+                    }
                     let section = self.createRecentSectionLayout()
                     section.boundarySupplementaryItems = [header]
                     return section

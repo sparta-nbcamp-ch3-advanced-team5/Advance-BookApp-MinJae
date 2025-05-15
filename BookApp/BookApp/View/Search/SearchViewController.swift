@@ -43,7 +43,11 @@ final class SearchViewController: UIViewController {
             .subscribe(onNext: { owner, indexPath in
                 var book: Book?
                 if indexPath.section == 0 {
-                    book = owner.viewModel.recentBooksArray[indexPath.row]
+                    if owner.viewModel.recentBooksArray.isEmpty {
+                        book = owner.viewModel.fetchedBooksArray[indexPath.row]
+                    } else {
+                        book = owner.viewModel.recentBooksArray[indexPath.row]
+                    }
                 } else if indexPath.section == 1 {
                     book = owner.viewModel.fetchedBooksArray[indexPath.row]
                 }
@@ -55,23 +59,13 @@ final class SearchViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        // 데이터가 성공적으로 불러오면 UI 반영
-        viewModel.fetchedBooks
-            .withUnretained(self)
+        // 검색 또는 상세페이지 진입 시 컬렉션 뷰 업데이트
+        Observable
+            .combineLatest(viewModel.fetchedBooks, viewModel.recentBooks)
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { owner, books in
-                owner.searchResultView.apply(at: .search, to: books)
-            })
-            .disposed(by: disposeBag)
-        
-        // 최근기록 UI 반영
-        viewModel.recentBooks
             .withUnretained(self)
-            .observe(on: MainScheduler.instance)
-            .subscribe { owner, books in
-                let fetchedBooks = owner.viewModel.fetchedBooksArray
-                let recentBooks = owner.viewModel.recentBooksArray
-                owner.searchResultView.apply(at: .recent, to: fetchedBooks, recentItem: recentBooks)
+            .subscribe{ (owner, books) in
+                owner.searchResultView.apply(at: .recent, to: books.0, recentItem: books.1)
             }.disposed(by: disposeBag)
     }
     // UI 구성 (설정 변경, View 추가, 레이아웃 설정)
