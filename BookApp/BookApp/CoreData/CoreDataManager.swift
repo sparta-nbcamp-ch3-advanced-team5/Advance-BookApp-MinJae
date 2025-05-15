@@ -8,18 +8,6 @@
 import UIKit
 import CoreData
 
-// 코어데이터 엔티티 이름
-enum CoreDataEntity {
-    static let MyBook = "MyBook"
-}
-
-// MyBook 엔티티 키
-enum MyBookKey {
-    static let title = "title"
-    static let author = "author"
-    static let price = "price"
-}
-
 final class CoreDataManager {
     
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
