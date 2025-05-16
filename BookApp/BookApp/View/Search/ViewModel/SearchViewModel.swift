@@ -16,6 +16,17 @@ final class SearchViewModel {
     private(set) var fetchedBooks = BehaviorSubject<[Book]>(value: [])
     private(set) var recentBooks = BehaviorSubject<[Book]>(value: [])
     
+    // 데이터 호출 상태 정의
+    enum FetchBookDataState {
+        case loading
+        case ready
+        case allLoaded
+    }
+    // 현재 페이지, 상태, 쿼리값 저장
+    private var currentPage = 1
+    private var currentState = FetchBookDataState.ready
+    private var currentQuery: String?
+    
     var fetchedBooksArray: [Book] {
         guard let books = try? fetchedBooks.value() else { return [] }
         return books
