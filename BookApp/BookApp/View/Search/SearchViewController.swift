@@ -66,7 +66,19 @@ final class SearchViewController: UIViewController {
             .withUnretained(self)
             .subscribe{ (owner, books) in
                 owner.searchResultView.apply(at: .recent, to: books.0, recentItem: books.1)
+                owner.viewModel.setCurrentFetchOption()
             }.disposed(by: disposeBag)
+        
+        // 컬렉션뷰의 contentOffset 변경에 따른 이벤트 처리 바인딩
+        searchResultView.rx.contentOffset
+            .subscribe(with: self, onNext: { owner, offset in
+                let collectionViewHeight = owner.searchResultView.contentSize.height
+                let deviceHeight = UIScreen.main.bounds.height
+                // 추가 업데이트 필요
+                if offset.y > abs(collectionViewHeight - deviceHeight) {
+                    owner.viewModel.fetchBooksForCurrentQuery()
+                }
+            }).disposed(by: disposeBag)
     }
     // UI 구성 (설정 변경, View 추가, 레이아웃 설정)
     private func setupUI() {
@@ -102,7 +114,8 @@ extension SearchViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
         guard let text = searchBar.text else { return }
-        viewModel.fetchBooks(query: text)
+        self.searchResultView.setContentOffset(.zero, animated: true)
+        viewModel.fetchFirstPageBooks(query: text)
     }
 }
 
