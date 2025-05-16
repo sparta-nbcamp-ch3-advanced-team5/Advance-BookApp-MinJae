@@ -7,6 +7,11 @@
 
 import Foundation
 
+struct BookResponse: Hashable, Decodable {
+    let documents: [Book]
+    let meta: Meta
+}
+
 struct Book: Hashable, Decodable {
     let title: String
     let authors: [String]
@@ -23,6 +28,10 @@ struct Book: Hashable, Decodable {
     }
 }
 
-struct BookResponse: Hashable, Decodable {
-    let documents: [Book]
+struct Meta: Hashable, Decodable {
+    let isEnd: Bool
+    
+    enum CodingKeys: String, CodingKey {
+        case isEnd = "is_end"
+    }
 }
