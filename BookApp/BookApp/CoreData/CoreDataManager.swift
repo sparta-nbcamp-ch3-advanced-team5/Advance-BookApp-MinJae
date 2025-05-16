@@ -23,9 +23,9 @@ final class CoreDataManager {
         mirror.children.forEach { child in
             if let label = child.label, keys.contains(label) {
                 if let authors = child.value as? [String] {
-                    newItem.setValue(authors.joined(separator: ", "), forKey: label)
+                    newItem.setValue(authors.joined(separator: ", "), forKey: EntityKeyTransfer.transfer(label))
                 } else {
-                    newItem.setValue(child.value, forKey: label)
+                    newItem.setValue(child.value, forKey: EntityKeyTransfer.transfer(label))
                 }
             }
         }
@@ -50,7 +50,10 @@ final class CoreDataManager {
             if let datas = books as? [NSManagedObject] {
                 for element in datas {
                     var data = [String: Any]()
-                    keys.map{ data[$0] = element.value(forKey: $0) }
+                    keys.map{
+                        let key = EntityKeyTransfer.transfer($0)
+                        data[key] = element.value(forKey: key)
+                    }
                     if let title = data["title"] as? String,
                        let authors = data["authors"] as? String,
                        let price = data["price"] as? Int
@@ -61,7 +64,7 @@ final class CoreDataManager {
                                  price: price,
                                  description: data["descriptionString"] as? String ?? nil,
                                  imageURL: data["imageURLString"] as? String ?? nil,
-                                 isRecent: false
+                                 isRecent: true
                                 )
                         )
                     }

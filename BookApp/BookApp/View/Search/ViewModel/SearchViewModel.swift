@@ -7,11 +7,11 @@
 
 import Foundation
 import RxSwift
-import RxRelay
 
 final class SearchViewModel {
     
     private let networkManager: NetworkManager
+    private let coreDataManager: CoreDataManager
     private let disposeBag = DisposeBag()
     private(set) var fetchedBooks = BehaviorSubject<[Book]>(value: [])
     private(set) var recentBooks = BehaviorSubject<[Book]>(value: [])
@@ -22,12 +22,14 @@ final class SearchViewModel {
     }
     
     var recentBooksArray: [Book] {
-        guard let books = try? recentBooks.value() else { return [] }
-        return books
+        return coreDataManager.read(for: .recentBook)
     }
     
-    init(networkManager: NetworkManager = .init()) {
+    init(networkManager: NetworkManager = .init(),
+         coreDataManager: CoreDataManager = .init()) {
         self.networkManager = networkManager
+        self.coreDataManager = coreDataManager
+        fetchRecentBooks()
     }
     
     // 데이터 불러오기
@@ -65,7 +67,22 @@ final class SearchViewModel {
         }
         appended.count > 10 ? _ = appended.popLast() : nil
         recentBooks.onNext(appended)
+        saveRecentBooksInCoreData(recents: appended)
         return
     }
-    
+    // 최근 기록 불러오기
+    func fetchRecentBooks() {
+        recentBooks.onNext(coreDataManager.read(for: .recentBook))
+    }
+    // 최근 기록 코어데이터 저장 (기존에 저장된 데이터 삭제하고 덮어씌우는 방식)
+    private func saveRecentBooksInCoreData(recents: [Book]) {
+        deleteAllRecentBooksInCoreData()
+        recents.forEach { book in
+            coreDataManager.create(for: .recentBook, to: book)
+        }
+    }
+    // 최근기록 데이터 모두 삭제
+    private func deleteAllRecentBooksInCoreData() {
+        coreDataManager.deleteAll(for: .recentBook)
+    }
 }
