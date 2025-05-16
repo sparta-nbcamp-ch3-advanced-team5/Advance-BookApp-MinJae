@@ -16,6 +16,17 @@ final class SearchViewModel {
     private(set) var fetchedBooks = BehaviorSubject<[Book]>(value: [])
     private(set) var recentBooks = BehaviorSubject<[Book]>(value: [])
     
+    // 데이터 호출 상태 정의
+    enum FetchBookDataState {
+        case loading
+        case ready
+        case allLoaded
+    }
+    // 현재 페이지, 상태, 쿼리값 저장
+    private var currentPage = 1
+    private var currentState = FetchBookDataState.ready
+    private var currentQuery: String?
+    
     var fetchedBooksArray: [Book] {
         guard let books = try? fetchedBooks.value() else { return [] }
         return books
@@ -32,12 +43,49 @@ final class SearchViewModel {
         fetchRecentBooks()
     }
     
-    // 데이터 불러오기
-    func fetchBooks(query: String) {
+    // 현재 데이터 호출옵션 저장 (데이터 호출 후에 호출됨)
+    func setCurrentFetchOption() {
+        self.currentPage += 1
+        self.currentState = .ready
+    }
+    
+    // 현재쿼리와 페이지에 맞는 데이터 불러오기 (무한스크롤 용)
+    func fetchBooksForCurrentQuery() {
+        
+        guard case .ready = currentState,
+              let currentQuery = self.currentQuery else {
+            return
+        }
+        
+        currentState = .loading
+        
         Task {
-            await networkManager.fetch(query: query)
+            await networkManager.fetch(query: currentQuery, page: currentPage)
+                .subscribe(onSuccess: {[weak self] (data: BookResponse) in
+                    guard let fetchedBooksArray = self?.fetchedBooksArray else { return }
+                    if data.meta.isEnd {
+                        self?.currentState = .allLoaded
+                        return
+                    }
+                    self?.fetchedBooks.onNext(fetchedBooksArray + data.documents)
+                }, onFailure: { error in
+                    print(error.localizedDescription)
+                }).disposed(by: disposeBag)
+        }
+    }
+    
+    // 첫번째 데이터 불러오기
+    func fetchFirstPageBooks(query: String) {
+        if case .loading = currentState {
+            print("데이터 로딩중, fetchBook method is not excuted")
+            return
+        }
+        currentState = .loading
+        Task {
+            await networkManager.fetch(query: query, page: 1)
                 .subscribe(onSuccess: {[weak self] (data: BookResponse) in
                     self?.fetchedBooks.onNext(data.documents)
+                    self?.currentQuery = query
                 }, onFailure: { error in
                     print(error.localizedDescription)
                 }).disposed(by: disposeBag)

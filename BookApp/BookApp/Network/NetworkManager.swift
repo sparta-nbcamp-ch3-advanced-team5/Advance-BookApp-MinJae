@@ -20,14 +20,17 @@ enum NetworkError: Error {
 final class NetworkManager {
     
     
-    func fetch<T: Decodable>(query: String) async -> Single<T> {
+    func fetch<T: Decodable>(query: String, page: Int) async -> Single<T> {
         return Single.create { observer in
             Task {
                 var urlComponents = URLComponents()
                 urlComponents.scheme = "https"
                 urlComponents.host = "dapi.kakao.com"
                 urlComponents.path = "/v3/search/book"
-                urlComponents.queryItems = [URLQueryItem(name: "query", value: query)]
+                urlComponents.queryItems = [
+                    URLQueryItem(name: "query", value: query),
+                    URLQueryItem(name: "page", value: String(page))
+                ]
                 guard let url = urlComponents.url else {
                     observer(.failure(NetworkError.invalidURL))
                     return
