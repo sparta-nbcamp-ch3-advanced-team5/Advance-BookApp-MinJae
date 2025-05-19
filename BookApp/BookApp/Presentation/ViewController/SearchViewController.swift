@@ -66,7 +66,6 @@ final class SearchViewController: UIViewController {
             .withUnretained(self)
             .subscribe{ (owner, books) in
                 owner.searchResultView.apply(at: .recent, to: books.0, recentItem: books.1)
-                owner.viewModel.setCurrentFetchOption()
             }.disposed(by: disposeBag)
         
         // 컬렉션뷰의 contentOffset 변경에 따른 이벤트 처리 바인딩

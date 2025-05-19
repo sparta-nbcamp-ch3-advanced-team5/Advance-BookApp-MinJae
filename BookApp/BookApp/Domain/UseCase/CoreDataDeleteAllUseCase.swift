@@ -7,7 +7,7 @@
 
 import Foundation
 
-class CoreDataDeleteAllUseCase {
+final class CoreDataDeleteAllUseCase {
     private let repository: CoreDataRepository
     
     init(repository: CoreDataRepository) {
