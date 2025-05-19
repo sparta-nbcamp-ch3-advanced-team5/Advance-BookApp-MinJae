@@ -78,11 +78,11 @@ final class CoreDataManager {
     }
     
     // DELETE
-    func delete(for entityModel: CoreDataEntity, book: Book) {
+    func delete(for entityModel: CoreDataEntity, item: Book) {
         guard let entityType = entityModel.object.type as? NSManagedObject.Type else { return }
         
         let request = entityType.fetchRequest()
-        request.predicate = NSPredicate(format: "title == %@", book.title)
+        request.predicate = NSPredicate(format: "title == %@", item.title)
         
         do {
             let result = try context.fetch(request)

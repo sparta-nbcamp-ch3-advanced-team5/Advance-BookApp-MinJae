@@ -16,7 +16,7 @@ final class FetchSearchBookRepeatingUseCase {
         self.repository = repository
     }
     
-    func excute() async -> Single<BookResponse> {
+    func execute() async -> Single<BookResponse> {
         return await repository.fetchSearchBookRepeat()
     }
 }

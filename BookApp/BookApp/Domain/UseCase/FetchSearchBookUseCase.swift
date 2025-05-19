@@ -15,7 +15,7 @@ final class FetchSearchBookUseCase {
         self.repository = repository
     }
     
-    func excute(query: String,
+    func execute(query: String,
                 page: Int) async -> Single<BookResponse> {
         return await repository.fetchSearchBook(query: query, page: page)
     }
