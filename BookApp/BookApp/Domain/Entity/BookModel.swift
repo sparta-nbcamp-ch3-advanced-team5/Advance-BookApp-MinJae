@@ -1,6 +1,6 @@
 //
 //  Model.swift
-//  BookApp
+//  BookModel
 //
 //  Created by MJ Dev on 5/11/25.
 //
