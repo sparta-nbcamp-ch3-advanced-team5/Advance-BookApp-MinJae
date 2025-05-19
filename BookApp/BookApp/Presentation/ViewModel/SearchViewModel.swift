@@ -10,11 +10,11 @@ import RxSwift
 
 final class SearchViewModel {
     
-    private let networkManager: NetworkManager
     private let coreDataManager: CoreDataManager
     private let disposeBag = DisposeBag()
     private(set) var fetchedBooks = BehaviorSubject<[Book]>(value: [])
     private(set) var recentBooks = BehaviorSubject<[Book]>(value: [])
+    
     
     // 데이터 호출 상태 정의
     enum FetchBookDataState {
@@ -22,10 +22,9 @@ final class SearchViewModel {
         case ready
         case allLoaded
     }
+    
     // 현재 페이지, 상태, 쿼리값 저장
-    private var currentPage = 1
     private var currentState = FetchBookDataState.ready
-    private var currentQuery: String?
     
     var fetchedBooksArray: [Book] {
         guard let books = try? fetchedBooks.value() else { return [] }
@@ -36,41 +35,43 @@ final class SearchViewModel {
         return coreDataManager.read(for: .recentBook)
     }
     
-    init(networkManager: NetworkManager = .init(),
-         coreDataManager: CoreDataManager = .init()) {
-        self.networkManager = networkManager
-        self.coreDataManager = coreDataManager
-        fetchRecentBooks()
-    }
+    private let fetchSearchBookUseCase: FetchSearchBookUseCase
+    private let fetchSearchBookRepeatingUseCase: FetchSearchBookRepeatingUseCase
     
-    // 현재 데이터 호출옵션 저장 (데이터 호출 후에 호출됨)
-    func setCurrentFetchOption() {
-        self.currentPage += 1
-        self.currentState = .ready
+    init(
+        coreDataManager: CoreDataManager = .init(),
+         fetchSearchBookUseCase: FetchSearchBookUseCase,
+         fetchSearchBookRepeatingUseCase: FetchSearchBookRepeatingUseCase
+    ) {
+        self.coreDataManager = coreDataManager
+        self.fetchSearchBookUseCase = fetchSearchBookUseCase
+        self.fetchSearchBookRepeatingUseCase = fetchSearchBookRepeatingUseCase
+        fetchRecentBooks()
     }
     
     // 현재쿼리와 페이지에 맞는 데이터 불러오기 (무한스크롤 용)
     func fetchBooksForCurrentQuery() {
         
-        guard case .ready = currentState,
-              let currentQuery = self.currentQuery else {
+        guard case .ready = currentState else {
             return
         }
         
         currentState = .loading
         
         Task {
-            await networkManager.fetch(query: currentQuery, page: currentPage)
-                .subscribe(onSuccess: {[weak self] (data: BookResponse) in
-                    guard let fetchedBooksArray = self?.fetchedBooksArray else { return }
-                    if data.meta.isEnd {
-                        self?.currentState = .allLoaded
-                        return
+            await fetchSearchBookRepeatingUseCase.excute()
+                .subscribe(with: self, onSuccess: { owner, response in
+                    let fetchedBooksArray = owner.fetchedBooksArray
+                    owner.fetchedBooks.onNext(fetchedBooksArray + response.documents)
+                    if response.meta.isEnd {
+                        owner.currentState = .allLoaded
+                    } else {
+                        owner.currentState = .ready
                     }
-                    self?.fetchedBooks.onNext(fetchedBooksArray + data.documents)
-                }, onFailure: { error in
+                }) { owner, error in
+                    print(#function)
                     print(error.localizedDescription)
-                }).disposed(by: disposeBag)
+                }.disposed(by: disposeBag)
         }
     }
     
@@ -82,14 +83,16 @@ final class SearchViewModel {
         }
         currentState = .loading
         Task {
-            await networkManager.fetch(query: query, page: 1)
-                .subscribe(onSuccess: {[weak self] (data: BookResponse) in
-                    self?.fetchedBooks.onNext(data.documents)
-                    self?.currentQuery = query
-                }, onFailure: { error in
+            await fetchSearchBookUseCase.excute(query: query, page: 1)
+                .subscribe(with: self, onSuccess: { owner, response in
+                    owner.fetchedBooks.onNext(response.documents)
+                    owner.currentState = .ready
+                }) { owner, error in
+                    print(#function)
                     print(error.localizedDescription)
-                }).disposed(by: disposeBag)
+                }.disposed(by: disposeBag)
         }
+        
     }
     // 최근기록 추가
     func appendRecentBook(_ book: inout Book) {
