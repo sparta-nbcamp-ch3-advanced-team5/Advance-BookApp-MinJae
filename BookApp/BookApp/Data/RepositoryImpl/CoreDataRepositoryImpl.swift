@@ -20,7 +20,7 @@ final class CoreDataRepositoryImpl: CoreDataRepository {
     }
     
     func read(for entityModel: CoreDataEntity) -> [Book] {
-        return coreDataManager.read(for: entityModel)
+        return coreDataManager.read(for: entityModel).map{ $0.toEntity() }
     }
     
     func delete(for entityModel: CoreDataEntity, item: Book) {
