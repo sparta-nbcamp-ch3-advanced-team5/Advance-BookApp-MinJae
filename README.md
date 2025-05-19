@@ -31,9 +31,9 @@ UIKit Codebase 기반으로 구성되었으며, **Clean Architecture + MVVM + Rx
 
 | 화면 | 설명 | 미리보기 |
 |------|------|-----------|
-| 검색 화면 | CoreData에 저장된 최근 기록과 검색으로 API 호출, 스크롤시 추가 데이터 불러오기 |  |
-| 마이 북 화면 | 찜한 책 목록 |  |
-| 책 상세 화면 | 상세 정보, 담기 / X 버튼 포함 | |
+| 검색 화면 | CoreData에 저장된 최근 기록과 검색으로 API 호출, 스크롤시 추가 데이터 불러오기 | ![Simulator Screen Recording - iPhone 16 Pro - 2025-05-19 at 22 56 51](https://github.com/user-attachments/assets/f5ce6257-3285-4719-8378-e1e214e16464) |
+| 마이 북 화면 | 찜한 책 목록 | ![Simulator Screen Recording - iPhone 16 Pro - 2025-05-19 at 22 57 31](https://github.com/user-attachments/assets/3083dd84-1fa8-4b36-8886-7fc3413c066c) |
+| 책 상세 화면 | 상세 정보, 담기 / X 버튼 포함 |![Simulator Screen Recording - iPhone 16 Pro - 2025-05-19 at 22 57 13](https://github.com/user-attachments/assets/beba2491-d37c-4ba3-8d3f-266dcf54b5b2) |
 
 
 ---
@@ -50,6 +50,5 @@ UIKit Codebase 기반으로 구성되었으며, **Clean Architecture + MVVM + Rx
 | **비동기 처리** | async/await , RxSwift |
 | **패키지 관리** | Swift Package Manager (SPM) |
 | **버전 관리** | Git, GitHub |
-| **외부 API** | [TMDB API](https://developer.themoviedb.org/) |
 
 ---
