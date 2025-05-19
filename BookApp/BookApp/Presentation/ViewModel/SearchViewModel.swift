@@ -10,11 +10,9 @@ import RxSwift
 
 final class SearchViewModel {
     
-    private let coreDataManager: CoreDataManager
     private let disposeBag = DisposeBag()
     private(set) var fetchedBooks = BehaviorSubject<[Book]>(value: [])
     private(set) var recentBooks = BehaviorSubject<[Book]>(value: [])
-    
     
     // 데이터 호출 상태 정의
     enum FetchBookDataState {
@@ -32,20 +30,31 @@ final class SearchViewModel {
     }
     
     var recentBooksArray: [Book] {
-        return coreDataManager.read(for: .recentBook)
+        return coreDataReadUseCase.execute(for: .recentBook)
     }
     
     private let fetchSearchBookUseCase: FetchSearchBookUseCase
     private let fetchSearchBookRepeatingUseCase: FetchSearchBookRepeatingUseCase
+    private let coreDataCreateUseCase: CoreDataCreateUseCase
+    private let coreDataReadUseCase: CoreDataReadUseCase
+    private let coreDataDeleteUseCase: CoreDataDeleteUseCase
+    private let coreDataDeleteAllUseCase: CoreDataDeleteAllUseCase
     
     init(
-        coreDataManager: CoreDataManager = .init(),
-         fetchSearchBookUseCase: FetchSearchBookUseCase,
-         fetchSearchBookRepeatingUseCase: FetchSearchBookRepeatingUseCase
+        fetchSearchBookUseCase: FetchSearchBookUseCase,
+        fetchSearchBookRepeatingUseCase: FetchSearchBookRepeatingUseCase,
+        coreDataCreateUseCase: CoreDataCreateUseCase,
+        coreDataReadUseCase: CoreDataReadUseCase,
+        coreDataDeleteUseCase: CoreDataDeleteUseCase,
+        coreDataDeleteAllUseCase: CoreDataDeleteAllUseCase
     ) {
-        self.coreDataManager = coreDataManager
         self.fetchSearchBookUseCase = fetchSearchBookUseCase
         self.fetchSearchBookRepeatingUseCase = fetchSearchBookRepeatingUseCase
+        self.coreDataCreateUseCase = coreDataCreateUseCase
+        self.coreDataReadUseCase = coreDataReadUseCase
+        self.coreDataDeleteUseCase = coreDataDeleteUseCase
+        self.coreDataDeleteAllUseCase = coreDataDeleteAllUseCase
+        
         fetchRecentBooks()
     }
     
@@ -59,7 +68,7 @@ final class SearchViewModel {
         currentState = .loading
         
         Task {
-            await fetchSearchBookRepeatingUseCase.excute()
+            await fetchSearchBookRepeatingUseCase.execute()
                 .subscribe(with: self, onSuccess: { owner, response in
                     let fetchedBooksArray = owner.fetchedBooksArray
                     owner.fetchedBooks.onNext(fetchedBooksArray + response.documents)
@@ -83,7 +92,7 @@ final class SearchViewModel {
         }
         currentState = .loading
         Task {
-            await fetchSearchBookUseCase.excute(query: query, page: 1)
+            await fetchSearchBookUseCase.execute(query: query, page: 1)
                 .subscribe(with: self, onSuccess: { owner, response in
                     owner.fetchedBooks.onNext(response.documents)
                     owner.currentState = .ready
@@ -123,17 +132,18 @@ final class SearchViewModel {
     }
     // 최근 기록 불러오기
     func fetchRecentBooks() {
-        recentBooks.onNext(coreDataManager.read(for: .recentBook))
+        let recent = coreDataReadUseCase.execute(for: .recentBook)
+        recentBooks.onNext(recent)
     }
     // 최근 기록 코어데이터 저장 (기존에 저장된 데이터 삭제하고 덮어씌우는 방식)
     private func saveRecentBooksInCoreData(recents: [Book]) {
         deleteAllRecentBooksInCoreData()
         recents.forEach { book in
-            coreDataManager.create(for: .recentBook, to: book)
+            coreDataCreateUseCase.execute(for: .recentBook, to: book)
         }
     }
     // 최근기록 데이터 모두 삭제
     private func deleteAllRecentBooksInCoreData() {
-        coreDataManager.deleteAll(for: .recentBook)
+        coreDataDeleteAllUseCase.execute(for: .recentBook)
     }
 }
