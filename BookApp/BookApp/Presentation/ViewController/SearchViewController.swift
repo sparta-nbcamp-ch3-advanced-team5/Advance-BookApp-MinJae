@@ -15,7 +15,16 @@ final class SearchViewController: UIViewController {
     private let searchBar = UISearchBar()
     private let searchResultView: BookListCollectionView
     private let disposeBag = DisposeBag()
-    private let viewModel = SearchViewModel()
+    let repoImpl = FetchSearchBookRepositoryImpl(networkManager: NetworkManager())
+    let coreRepoImpl = CoreDataRepositoryImpl(coreDataManager: CoreDataManager())
+    private lazy var viewModel = SearchViewModel(
+        fetchSearchBookUseCase: FetchSearchBookUseCase(repository: repoImpl),
+        fetchSearchBookRepeatingUseCase: FetchSearchBookRepeatingUseCase(repository: repoImpl),
+        coreDataCreateUseCase: CoreDataCreateUseCase(repository: coreRepoImpl),
+        coreDataReadUseCase: CoreDataReadUseCase(repository: coreRepoImpl),
+        coreDataDeleteUseCase: CoreDataDeleteUseCase(repository: coreRepoImpl),
+        coreDataDeleteAllUseCase: CoreDataDeleteAllUseCase(repository: coreRepoImpl)
+    )
     private let popupView = SearchPopupView()
     
     init() {

@@ -25,7 +25,11 @@ final class BookDetailViewController: UIViewController {
     weak var delegate: BookDetailViewControllerDelegate?
     
     init(book: Book) {
-        self.viewModel = BookDetailViewModel(item: book)
+        let coredataImpl = CoreDataRepositoryImpl(coreDataManager: CoreDataManager())
+        self.viewModel = BookDetailViewModel(item: book,
+                                             coreDataReadUseCase: CoreDataReadUseCase(repository: coredataImpl),
+                                             coreDataCreateUseCase: CoreDataCreateUseCase(repository: coredataImpl)
+        )
         self.bookDetailView = BookDetailView(book: viewModel.item)
         super.init(nibName: nil, bundle: nil)
     }
