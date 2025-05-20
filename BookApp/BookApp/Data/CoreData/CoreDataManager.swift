@@ -38,7 +38,7 @@ final class CoreDataManager {
     }
     
     // READ
-    func read(for entityModel: CoreDataEntity) -> [Book] {
+    func read(for entityModel: CoreDataEntity) -> [BookDTO] {
         
         guard let entityType = entityModel.object.type as? NSManagedObject.Type else { return [] }
         
@@ -46,7 +46,7 @@ final class CoreDataManager {
         
         do {
             let books = try context.fetch(entityType.fetchRequest())
-            var result = [Book]()
+            var result = [BookDTO]()
             if let datas = books as? [NSManagedObject] {
                 for element in datas {
                     var data = [String: Any]()
@@ -59,7 +59,7 @@ final class CoreDataManager {
                        let price = data["price"] as? Int
                     {
                         result.append(
-                            Book(title: title,
+                            BookDTO(title: title,
                                  authors: authors.components(separatedBy: ", "),
                                  price: price,
                                  description: data["descriptionString"] as? String ?? nil,
@@ -78,11 +78,11 @@ final class CoreDataManager {
     }
     
     // DELETE
-    func delete(for entityModel: CoreDataEntity, book: Book) {
+    func delete(for entityModel: CoreDataEntity, item: Book) {
         guard let entityType = entityModel.object.type as? NSManagedObject.Type else { return }
         
         let request = entityType.fetchRequest()
-        request.predicate = NSPredicate(format: "title == %@", book.title)
+        request.predicate = NSPredicate(format: "title == %@", item.title)
         
         do {
             let result = try context.fetch(request)

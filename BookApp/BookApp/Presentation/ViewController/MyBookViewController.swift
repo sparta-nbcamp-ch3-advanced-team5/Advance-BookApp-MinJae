@@ -12,7 +12,11 @@ import RxSwift
 final class MyBookViewController: UIViewController {
 
     private(set) var myBookCollectionView = BookListCollectionView(section: .myBook)
-    private let viewModel = MyBookViewModel()
+    private let coreRepoImpl = CoreDataRepositoryImpl(coreDataManager: CoreDataManager())
+    private lazy var viewModel = MyBookViewModel(
+        coreDataReadUseCase: CoreDataReadUseCase(repository: coreRepoImpl),
+        coreDataDeleteUseCase: CoreDataDeleteUseCase(repository: coreRepoImpl),
+        coreDataDeleteAllUseCase: CoreDataDeleteAllUseCase(repository: coreRepoImpl))
     private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {

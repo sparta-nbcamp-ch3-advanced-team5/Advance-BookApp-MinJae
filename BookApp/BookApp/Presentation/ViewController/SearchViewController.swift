@@ -15,7 +15,16 @@ final class SearchViewController: UIViewController {
     private let searchBar = UISearchBar()
     private let searchResultView: BookListCollectionView
     private let disposeBag = DisposeBag()
-    private let viewModel = SearchViewModel()
+    let repoImpl = FetchSearchBookRepositoryImpl(networkManager: NetworkManager())
+    let coreRepoImpl = CoreDataRepositoryImpl(coreDataManager: CoreDataManager())
+    private lazy var viewModel = SearchViewModel(
+        fetchSearchBookUseCase: FetchSearchBookUseCase(repository: repoImpl),
+        fetchSearchBookRepeatingUseCase: FetchSearchBookRepeatingUseCase(repository: repoImpl),
+        coreDataCreateUseCase: CoreDataCreateUseCase(repository: coreRepoImpl),
+        coreDataReadUseCase: CoreDataReadUseCase(repository: coreRepoImpl),
+        coreDataDeleteUseCase: CoreDataDeleteUseCase(repository: coreRepoImpl),
+        coreDataDeleteAllUseCase: CoreDataDeleteAllUseCase(repository: coreRepoImpl)
+    )
     private let popupView = SearchPopupView()
     
     init() {
@@ -66,7 +75,6 @@ final class SearchViewController: UIViewController {
             .withUnretained(self)
             .subscribe{ (owner, books) in
                 owner.searchResultView.apply(at: .recent, to: books.0, recentItem: books.1)
-                owner.viewModel.setCurrentFetchOption()
             }.disposed(by: disposeBag)
         
         // 컬렉션뷰의 contentOffset 변경에 따른 이벤트 처리 바인딩
